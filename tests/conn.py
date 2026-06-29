@@ -11,6 +11,11 @@ to a different unit, re-confirm with `python 00_list_usb.py` and edit below
 Windows + Zadig: the printer must be bound to WinUSB / libusb-win32 so pyusb
 can claim it. Only one driver can own the device; if Usb() raises a backend
 error, check Zadig is bound to WinUSB, not the Epson APD printer driver.
+
+Profile note: until the TM-T20III profile is registered in python-escpos's
+capabilities (see scripts/build_capabilities.py), get_escpos() automatically
+falls back to profile=None, which uses safe defaults and is confirmed working
+on this unit (matches rr-receipt's receipt_encoder.find_printer()).
 """
 
 import sys
@@ -23,10 +28,22 @@ PROFILE = "TM-T20III"
 
 
 def get_escpos(profile=PROFILE):
-    """Primary path: python-escpos Usb device using our custom profile."""
+    """Primary path: python-escpos Usb device.
+
+    Tries the requested profile first; if that profile name isn't registered
+    in the capabilities DB yet (KeyError), falls back to profile=None (safe
+    defaults, confirmed working on this unit). This lets the high-level probes
+    (03_bitmap_emoji, 06_profile_smoke) run before the custom profile is built.
+    """
     from escpos.printer import Usb
-    return Usb(VENDOR_ID, PRODUCT_ID, profile=profile,
-               in_ep=IN_EP, out_ep=OUT_EP)
+    try:
+        return Usb(VENDOR_ID, PRODUCT_ID, profile=profile,
+                   in_ep=IN_EP, out_ep=OUT_EP)
+    except KeyError:
+        print(f"[conn] profile {profile!r} not registered; "
+              "using profile=None (safe defaults).", file=sys.stderr)
+        return Usb(VENDOR_ID, PRODUCT_ID, profile=None,
+                   in_ep=IN_EP, out_ep=OUT_EP)
 
 
 class RawUsb:
