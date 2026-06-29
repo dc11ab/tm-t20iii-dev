@@ -4,3 +4,9 @@ __pycache__/
 capabilities.json
 *.orig
 artifacts/scans/
+
+# Don't chug this big PDF blob, the TM-T20III Technical Reference Guide Rev. A from EPSON 
+# https://files.support.epson.com/pdf/pos/bulk/tm-t20iii_trg_en_reva.pdf
+# Latest revision A, found on 2026-06-29
+# Stored on Github as a backup only.
+/docs/tm-t20iii_trg_en_reva.pdf
