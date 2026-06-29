@@ -42,12 +42,34 @@ Fix applied: [x] send ESC R 0 (1B 52 00) per job after ESC @
              [ ] changed memory-switch default to USA (optional, via Utility)
 ```
 
-## Code pages (tests/02_codepage_matrix.py)
+## Code pages (tests/02_codepage_matrix.py)  ** RESOLVED **
 
 ```
-Page rendering å ä ö correctly:  ____  (encoding ______)
-Chosen rr-receipt default page:  ____
-Euro sign OK on page 19?         [ ] yes  [ ] no
+Page rendering å ä ö correctly:  0 (CP437), 2 (CP850), 5 (CP865), 19 (CP858)
+                                 all render "Smorgas åäö ÅÄÖ" correctly from
+                                 the DOS byte positions.
+  Page 16 (CP1252): DOS-bytes line is garbage (expected); the 1252-bytes line
+    reads "Smörgås åäö ÅÄÖ" correctly (correct when text is CP1252-encoded).
+  Page 18 (CP852): å/Å slot becomes ć/Ć — NOT suitable for Swedish.
+  Page 45 (CP1250): DOS-bytes garbage (Windows codepage, expected).
+
+Chosen rr-receipt default page:  19 (CP858)
+  Rationale: renders å ä ö correctly AND carries € at 0xD5 in the same page.
+  CP1252 (page 16) is the equally-valid alternative for UTF-8/Windows source
+  text; kept selectable (see configurable code page, below).
+
+Euro sign OK on page 19?         [x] yes  (euro(0xD5) printed € correctly)
+```
+
+## Configurable code page (rr-receipt)
+
+```
+Default:        CP858 (Epson page 19)
+Override via:   [ ] CLI flag        (e.g. --codepage CP858 / --codepage CP1252)
+                [ ] Admin-UI setting (printer settings -> code page dropdown)
+Allowed values: CP858, CP1252, CP850, CP865, CP437  (all confirmed to render
+                Swedish; CP858/CP1252 also carry €)
+Status:         decided; implementation pending in rr-receipt repo.
 ```
 
 ## Bitmaps / glyphs (tests/03, tests/04)
