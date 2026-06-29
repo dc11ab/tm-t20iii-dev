@@ -14,7 +14,13 @@ ESC/POS code-table matrix and has a public Technical Reference Guide, so the
 profile values are documentation-backed — and the key ones are now
 hardware-confirmed on a real unit.
 
-## Status
+## Context
+
+The Epson TM-T20III is a compact, monochrome thermal receipt printer. It utilizes direct thermal printing technology, which eliminates the need for ink or toner, producing high-quality text and graphics at speeds up to 200mm per second. The printer is known for its reliability and ease of integration, offering various connectivity options including USB, serial, parallel, and Ethernet interfaces (depending upon model).
+
+**The TM-T20III supports standard width of 80mm roll paper**. It also features an adjustable paper guide that allows it to accommodate 58mm paper rolls. The printer includes an auto-cutter function to separate receipts and typically supports roll diameters up to 83mm, ensuring extended operation without frequent paper changes.
+
+## Development status
 
 Hardware testing is **done**. The profile is **PR-ready** (stops short of the
 actual upstream PR — see `docs/pr-readiness.md`).
