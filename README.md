@@ -30,7 +30,7 @@ actual upstream PR — see `docs/pr-readiness.md`).
 | `00_list_usb.py` | USB id / endpoints | ✅ 04B8:0E28, EP 0x01/0x82 |
 | `01_at_and_pipe.py` | @ / \| fix | ✅ R0 USA; fix = send `ESC R 0` |
 | `02_codepage_matrix.py` | code page for åäö / € | ✅ default CP858 |
-| `03_bitmap_emoji.py` | raster image / logo | ✅ Viadal logo prints clean |
+| `03_bitmap_emoji.py` | raster image / logo | ✅ Logo png prints clean |
 | `04_user_defined_glyph.py` | `ESC &` custom glyph | not run (not needed) |
 | `05_nv_logo.py` | NV stored logo | ⏭️ skipped (issue #7, wontfix) |
 
