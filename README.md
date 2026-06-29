@@ -11,7 +11,22 @@ two real problems in the `rr-receipt` app:
 
 Unlike a guessed profile, the TM-T20III is fully documented: it's in Epson's
 ESC/POS code-table matrix and has a public Technical Reference Guide, so the
-profile values are documentation-backed.
+profile values are documentation-backed — and the key ones are now
+hardware-confirmed on a real unit.
+
+## Status
+
+Hardware testing is **done**. The profile is **PR-ready** (stops short of the
+actual upstream PR — see `docs/pr-readiness.md`).
+
+| Probe | What | Status |
+|-------|------|--------|
+| `00_list_usb.py` | USB id / endpoints | ✅ 04B8:0E28, EP 0x01/0x82 |
+| `01_at_and_pipe.py` | @ / \| fix | ✅ R0 USA; fix = send `ESC R 0` |
+| `02_codepage_matrix.py` | code page for åäö / € | ✅ default CP858 |
+| `03_bitmap_emoji.py` | raster image / logo | ✅ Viadal logo prints clean |
+| `04_user_defined_glyph.py` | `ESC &` custom glyph | not run (not needed) |
+| `05_nv_logo.py` | NV stored logo | ⏭️ skipped (issue #7, wontfix) |
 
 ## Layout
 
@@ -24,13 +39,14 @@ tests/     00_list_usb.py         confirm USB IDs / endpoints (run first)
            04_user_defined_glyph.py  ESC & — custom glyph at text speed
            05_nv_logo.py          NV logo by key code (GS ( L / FS p)
            06_profile_smoke.py    validate via python-escpos once registered
-           conn.py                Usb() primary, raw pyusb fallback
+           conn.py                Usb() primary (profile=None fallback), raw pyusb
 scripts/   build_capabilities.py  make TM-T20III resolvable (the "recompile")
 docs/      at-and-pipe.md         root cause + fix for the @/| bug
            bitmaps-and-glyphs.md  emoji/bitmap/glyph options & tradeoffs
            codepages.md           code-page map decisions
-           logo.md                NV-graphics findings + log
-           hardware.md            this unit's confirmed facts (fill in)
+           logo.md                NV-graphics findings (not pursued)
+           hardware.md            this unit's confirmed facts
+           pr-readiness.md        upstream submission checklist
 assets/    put emoji/logo PNGs here for tests/03
 artifacts/ scans/photos of probe printouts (PR evidence)
 ```
@@ -57,27 +73,31 @@ controls these — see `docs/at-and-pipe.md` for why.
 
 ## Two tracks (keep separate)
 
-1. **Profile PR** (small): the `.yml` carries name/vendor/notes, `codePages`,
-   `media.width`, feature flags. Reviewed via `yamllint` + the DB build.
-2. **App features** (in rr-receipt): `ESC R 0`, NV logo, raster images,
-   user-defined glyphs are print-time commands, not profile fields. The profile
-   just advertises `graphics: true`. Probes prototype them here first.
+1. **Profile (this repo → escpos-printer-db PR):** the `.yml` carries
+   name/vendor/notes, `media` (width + dpi), `fonts`, and `codePages`. Feature
+   support is inherited from `inherits: default` — the profile does **not**
+   redeclare a `features` block, matching merged Epson profiles. Reviewed via
+   `yamllint` + the DB build. See `docs/pr-readiness.md`.
+2. **App features (in rr-receipt):** `ESC R 0`, the code-page selection, NV
+   logo, raster images, user-defined glyphs are print-time commands and runtime
+   config, **not** profile fields. Tracked in rr-receipt issue #55. Probes here
+   prototype them first.
 
 ## The "recompile escpos" reality
 
 python-escpos isn't recompiled — it loads a generated `capabilities.json` built
 from escpos-printer-db's YAML. Use our profile by regenerating that JSON from a
 DB checkout containing `TM-T20III.yml`, or point the library at a custom file
-via `ESCPOS_CAPABILITIES_FILE`. See `scripts/build_capabilities.py`.
+via `ESCPOS_CAPABILITIES_FILE`. See `scripts/build_capabilities.py`. (Until then
+`conn.get_escpos()` falls back to `profile=None`, which is confirmed working.)
 
-## Upstream PR checklist
+## Upstream PR
 
-- [ ] Confirm code-page set on hardware (`tests/02`); fix `[VERIFY]` codec names
-- [ ] Confirm `media.width.pixels` (512 vs 576)
-- [ ] Confirm NV-graphics method (`tests/05`); note in `docs/logo.md`
-- [ ] `yamllint profile/TM-T20III.yml` passes
-- [ ] Attach probe printout photos from `artifacts/`
-- [ ] Open an issue first (per the guide), then PR `TM-T20III.yml`
+The profile is written to match merged-profile conventions and carries no
+unverified codec names. The full readiness checklist, evidence table, and a
+ready-to-adapt PR description live in **`docs/pr-readiness.md`**. The two
+remaining gates are local: run `yamllint`, and validate against a real
+escpos-printer-db build. **The PR itself is intentionally left to do manually.**
 
 ## References
 
