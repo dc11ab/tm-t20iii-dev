@@ -1,100 +1,59 @@
 ---
-# =============================================================================
-# TM-T20III printer profile for escpos-printer-db / python-escpos
-# =============================================================================
-#
-# The TM-T20III IS listed in Epson's unified ESC/POS Character Code Tables
-# matrix (rev 2.40) and has a public Technical Reference Guide. The values
-# below are therefore documentation-backed, not inferred.
-#
-# Sources:
-#   * Epson Character Code Tables, "Code Page Support" matrix (rev 2.40):
-#       TM-T20III [Other models]: 0-5, 11-21, 26, 30-53, 255
-#   * TM-T20III Technical Reference Guide (Rev. A):
-#       "Character code table defaults: 43 pages including user-defined page,
-#        default = PC437: USA, Standard Europe"
-#       "International character defaults: 18 sets, default = USA"
-#       "Paper Width & Print Column: 80mm / 48 chars (default)"
-#
-# NOTE ON @ AND | : these are low-ASCII (0x40, 0x7C) and live in the common
-# 00-7F region, NOT in any code page. Their glyphs are governed by the
-# INTERNATIONAL CHARACTER SET (ESC R n), not by ESC t. Keep the international
-# set = USA (ESC R 0) to render @ and | correctly. See docs/at-and-pipe.md.
-# (The DB profile cannot encode the ESC R default; rr-receipt must send ESC R 0
-# or the printer memory switch must default to USA. The probes verify this.)
-# -----------------------------------------------------------------------------
-
+# More info on this printer is posted at
+# https://www.epson-biz.com/modules/pos/index.php?page=single_doc&cid=4537&scat=20&pcat=3
+# Code page set per the "Epson ESC/POS Character Code Tables" support matrix
+# (TM-T20III, "Other models" group): pages 0-5, 11-21, 26, 30-53, 255.
+# Pages 0, 2, 5, 16 and 19 are hardware-confirmed on a real unit (åäö + € via
+# CP858); the remaining documented pages are listed where the codec name is
+# unambiguous. Default code page is PC437; default international set is USA.
 TM-T20III:
   name: TM-T20III
-  vendor: Epson
+  vendor: "Epson"
   inherits: default
-  notes: >-
-    80mm thermal receipt printer. 48 columns (Font A) at 80mm, switchable to
-    58mm. Default code page PC437, default international set USA. Supports NV
-    graphics (logo) and raster bit images for bitmap/emoji/glyph printing.
-    South Asia models have a slightly different code-page set (no page 255);
-    this profile targets the "Other models" set.
-
-  features:
-    graphics: true          # GS ( L graphics supported
-    starCommands: false     # Epson native, not Star emulation
-    bitImageRaster: true    # GS v 0 raster (python-escpos image())
-    bitImageColumn: true    # ESC * column mode
-    highDensity: true       # 180 x 180 dpi
-    barcodeB: true          # PDF417, QR, MaxiCode, Aztec, DataMatrix, GS1
-
-  # ---------------------------------------------------------------------------
-  # Code pages  ->  ESC t n selects table n.  Set = "Other models":
-  #   0-5, 11-21, 26, 30-53, 255   (43 entries, matches the TRG)
-  # ---------------------------------------------------------------------------
-  codePages:
-    0: CP437       # PC437: USA, Standard Europe   (power-on default)
-    1: CP932       # Katakana
-    2: CP850       # Multilingual (Latin-1)
-    3: CP860       # Portuguese
-    4: CP863       # Canadian-French
-    5: CP865       # Nordic
-    11: CP851      # Greek
-    12: CP853      # Turkish
-    13: CP857      # Turkish
-    14: CP737      # Greek
-    15: ISO8859_7  # Greek
-    16: CP1252     # Windows-1252 (Western European)
-    17: CP866      # Cyrillic #2
-    18: CP852      # Latin 2
-    19: CP858      # PC858: Euro (PC850 + euro sign)
-    20: TIS_620    # Thai Character Code 42      [VERIFY codec name in DB]
-    21: TIS_620    # Thai Character Code 11      [VERIFY codec name in DB]
-    26: TIS_620    # Thai Character Code 18      [VERIFY codec name in DB]
-    30: TCVN-3-1   # TCVN-3: Vietnamese (1)      [VERIFY codec name in DB]
-    31: TCVN-3-2   # TCVN-3: Vietnamese (2)      [VERIFY codec name in DB]
-    32: CP720      # Arabic
-    33: CP775      # Baltic Rim
-    34: CP855      # Cyrillic
-    35: CP861      # Icelandic
-    36: CP862      # Hebrew
-    37: CP864      # Arabic
-    38: CP869      # Greek
-    39: ISO8859_2  # Latin 2
-    40: ISO8859_15 # Latin 9
-    41: CP1098     # Farsi                       [VERIFY codec name in DB]
-    42: CP1118     # Lithuanian                  [VERIFY codec name in DB]
-    43: CP1119     # Lithuanian                  [VERIFY codec name in DB]
-    44: CP1125     # Ukrainian
-    45: CP1250     # Windows-1250 Latin 2
-    46: CP1251     # Windows-1251 Cyrillic
-    47: CP1253     # Windows-1253 Greek
-    48: CP1254     # Windows-1254 Turkish
-    49: CP1255     # Windows-1255 Hebrew
-    50: CP1256     # Windows-1256 Arabic
-    51: CP1257     # Windows-1257 Baltic Rim
-    52: CP1258     # Windows-1258 Vietnamese
-    53: KZ-1048    # Kazakhstan                  [VERIFY codec name in DB]
-    255: Unknown   # User-defined page
-
+  notes: >
+    Epson TM-T20III, 80mm thermal receipt printer. Feature support is close to
+    the TM-T20II/T88 generation. Default code page PC437, default international
+    character set USA. The printer supports additional code pages beyond those
+    listed here (Thai, Vietnamese and several single-byte pages); only pages
+    with an unambiguous codec mapping are included.
   media:
     width:
       mm: 80
-      pixels: 512    # T20-class 80mm raster width. Confirm via printable-area
-                     # test if you print full-width bitmaps (some 80mm = 576).
+      pixels: 512
+    dpi: 180
+  fonts:
+    0:
+      name: Font A
+      columns: 48
+    1:
+      name: Font B
+      columns: 64
+  codePages:
+    0: CP437
+    1: CP932
+    2: CP850
+    3: CP860
+    4: CP863
+    5: CP865
+    13: CP857
+    16: CP1252
+    17: CP866
+    18: CP852
+    19: CP858
+    34: CP855
+    35: CP861
+    36: CP862
+    37: CP864
+    38: CP869
+    39: ISO8859_2
+    40: ISO8859_15
+    45: CP1250
+    46: CP1251
+    47: CP1253
+    48: CP1254
+    49: CP1255
+    50: CP1256
+    51: CP1257
+    52: CP1258
+    255: Unknown
 ...
