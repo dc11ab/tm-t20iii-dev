@@ -99,6 +99,12 @@ ready-to-adapt PR description live in **`docs/pr-readiness.md`**. The two
 remaining gates are local: run `yamllint`, and validate against a real
 escpos-printer-db build. **The PR itself is intentionally left to do manually.**
 
+## License
+
+MIT (see [`LICENSE`](LICENSE)) — chosen to match python-escpos and to be
+permissively compatible with escpos-printer-db's CC BY 4.0, so the profile can
+be incorporated upstream without friction.
+
 ## References
 
 - [Epson Character Code Tables](https://download4.epson.biz/sec_pubs/pos/reference_en/charcode/index.html) — support matrix + master page list
