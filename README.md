@@ -81,8 +81,8 @@ via `ESCPOS_CAPABILITIES_FILE`. See `scripts/build_capabilities.py`.
 
 ## References
 
-- Epson Character Code Tables — support matrix + master page list
-- Epson ESC/POS Command Reference rev 3.40 — `ESC t`, `ESC R`, `ESC &`,
+- [Epson Character Code Tables](https://download4.epson.biz/sec_pubs/pos/reference_en/charcode/index.html) — support matrix + master page list
+- [Epson ESC/POS Command Reference rev 3.40](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/index.html) — `ESC t`, `ESC R`, `ESC &`,
   `GS ( L`, `FS p`, `GS v 0`
-- TM-T20III Technical Reference Guide (Rev. A)
-- escpos-printer-db `doc/add-your-printer.md`
+- [TM-T20III Technical Reference Guide (Rev. A)](https://files.support.epson.com/pdf/pos/bulk/tm-t20iii_trg_en_reva.pdf)
+- [escpos-printer-db](https://github.com/receipt-print-hq/escpos-printer-db) `doc/add-your-printer.md`
