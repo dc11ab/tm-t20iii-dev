@@ -5,11 +5,11 @@ Fill in from the probes and the printer self-test.
 ## USB identity (tests/00_list_usb.py)
 
 ```
-idVendor:    0x04b8 (expected)
-idProduct:   0x____   (conn.py provisional 0x0e03 — confirm)
-OUT endpoint: 0x__
-IN endpoint:  0x__
-Zadig driver: [ ] WinUSB  [ ] libusb-win32  [ ] other
+idVendor:    0x04b8 (Seiko Epson)
+idProduct:   0x0e28   (confirmed via Zadig + 00_list_usb.py)
+OUT endpoint: 0x01
+IN endpoint:  0x82
+Zadig driver: [x] WinUSB  [ ] libusb-win32  [ ] other
 ```
 
 ## Self-test (power on holding Feed)
@@ -19,15 +19,27 @@ Product name:
 Firmware version:
 Resident fonts:
 Default code table:
-Default international set:   <-- if this is NOT USA, it explains the @/| bug
+Default international set:   <-- TODO: run self-test. If this is NOT USA, it
+                                explains why rr-receipt saw broken @/|.
 ```
 
-## @ and | (tests/01_at_and_pipe.py)  ** primary issue **
+## @ and | (tests/01_at_and_pipe.py)  ** primary issue — RESOLVED **
 
 ```
-International set where @ AND | are both correct:  R__  (______)
-Was the printer's default set already USA?         [ ] yes  [ ] no
-Fix applied: [ ] send ESC R 0 per job  [ ] changed memory-switch default to USA
+International set where @ AND | are both correct:  R0  (USA)
+  Other "clean ASCII" rows that also keep @ and |: R3 UK, R8 Japan,
+  R13 Korea, R15 China — but each alters the #/$ slot (UK #->£,
+  Japan/China $->¥), so R0 USA is the only fully-correct row.
+  Non-USA Western sets (R1 France, R2 Germany, R5 Sweden, R7/R11 Spain,
+  R4/R10 Denmark, R9 Norway, ...) remap 0x40/0x7C -> accented/currency.
+
+Mechanism confirmed: code page was held fixed during the test; @ and |
+changed purely with ESC R. So ESC R (international set), not ESC t
+(code page), governs these characters. See docs/at-and-pipe.md.
+
+Was the printer's default set already USA?   [ ] yes  [ ] no  (TODO: self-test)
+Fix applied: [x] send ESC R 0 (1B 52 00) per job after ESC @
+             [ ] changed memory-switch default to USA (optional, via Utility)
 ```
 
 ## Code pages (tests/02_codepage_matrix.py)
