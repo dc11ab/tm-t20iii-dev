@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+capabilities.json
+*.orig
+artifacts/scans/
