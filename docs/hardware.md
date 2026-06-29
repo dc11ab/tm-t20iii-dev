@@ -69,15 +69,26 @@ Override via:   [ ] CLI flag        (e.g. --codepage CP858 / --codepage CP1252)
                 [ ] Admin-UI setting (printer settings -> code page dropdown)
 Allowed values: CP858, CP1252, CP850, CP865, CP437  (all confirmed to render
                 Swedish; CP858/CP1252 also carry €)
-Status:         decided; implementation pending in rr-receipt repo.
+Status:         decided; implementation pending in rr-receipt repo (issue #55).
 ```
 
-## Bitmaps / glyphs (tests/03, tests/04)
+## Bitmaps / glyphs (tests/03, tests/04)  ** RASTER RESOLVED **
 
 ```
-Raster image() printed test bitmap?   [ ] yes  [ ] no
-Emoji PNG printed acceptably?         [ ] yes  [ ] no
-User-defined bold | (ESC &) worked?   [ ] yes  [ ] no
+Raster image() printed test bitmap?   [x] yes  (checker + bold pipe bar clean)
+Real PNG printed acceptably?          [x] yes  (Viadal_Ultra_Horizontal.png —
+                                       wordmark + foot line-art printed sharp,
+                                       no banding/garbage; via profile=None +
+                                       impl="bitImageRaster")
+User-defined bold | (ESC &) worked?   [ ] not tested (probe 04 not run; not
+                                       needed — raster path covers logo/glyphs,
+                                       and the ESC R 0 fix already gives a
+                                       correct resident |)
+
+Note: very fine hairline strokes in the foot logo are near the 203 dpi 1-bit
+limit; printed fine here, watch on worn heads / low density. Wordmark has ample
+margin. Confirms the decision to skip NV-stored logo (issue #7) — the raster
+path rr-receipt already uses produces a good result.
 ```
 
 ## Media width
@@ -88,11 +99,13 @@ Columns (Font A): __
 media.width.pixels: [ ] 512  [ ] 576
 ```
 
-## NV logo (tests/05, docs/logo.md)
+## NV logo (tests/05, docs/logo.md)  ** NOT PURSUED — see issue #7 (wontfix) **
 
 ```
-NV graphics present?  [ ] yes  [ ] no
-Working method:       [ ] GS ( L  [ ] FS p  [ ] R/E auto  [ ] none
+Decision: skip NV-stored logo. rr-receipt prints the logo as a raster image
+(printer.image, impl="bitImageRaster") every receipt — confirmed good above.
+NV path would only save streaming time but needs the Epson Utility + a driver
+swap off WinUSB. Probe tests/05_nv_logo.py + how-to retained for future use.
 ```
 
 ## Outcome
