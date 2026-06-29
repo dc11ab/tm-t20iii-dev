@@ -1,5 +1,14 @@
 # Built-in logo (NV graphics / Receipt Enhancement) — TM-T20III
 
+> **Status: NOT PURSUED (decided 2026-06-29).** rr-receipt prints the Viadal
+> logo reliably as a raster image on every receipt
+> (`receipt_encoder._print_logo()` → `printer.image(..., impl="bitImageRaster")`),
+> which is fast enough for this use case. The NV-stored-logo path would only
+> save per-receipt bitmap-streaming time, at the cost of installing the Epson
+> TM-T20III Utility and a Zadig/Device-Manager driver swap (the Utility needs
+> the Epson driver, not WinUSB). Not worth it. See issue #7 (closed wontfix).
+> The probe and how-to below are kept in case we ever want the speed-up later.
+
 The T20III TRG documents all of this directly (no guessing needed):
 
 - **NV Graphics Memory** — logos registered via the **Epson TM-T20III Utility**,
@@ -17,7 +26,7 @@ The T20III TRG documents all of this directly (no guessing needed):
 
 `tests/05_nv_logo.py` fires both; record which works.
 
-## Procedure
+## Procedure (if revisited)
 
 1. Install the Epson **TM-T20III Utility** (Windows).
 2. Register a monochrome logo to NV graphics with a known key code.
@@ -25,15 +34,9 @@ The T20III TRG documents all of this directly (no guessing needed):
    into `artifacts/`.
 4. Put that key code in `tests/05_nv_logo.py`; run it.
 
-## Findings (fill in from hardware)
+## Findings
 
 ```
-Date:
-Firmware version (self-test):
-NV graphics present?         [ ] yes  [ ] no
-Stored key code(s):
-GS ( L (fn 69) printed logo?  [ ] yes  [ ] no
-FS p printed logo?            [ ] yes  [ ] no
-R/E auto top/bottom logo?     [ ] yes  [ ] no
-Notes:
+Status: not tested — NV-logo path not pursued (see banner above).
+Logo on receipts is handled by raster image() in rr-receipt instead.
 ```
