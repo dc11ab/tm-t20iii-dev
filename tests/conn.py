@@ -3,9 +3,10 @@ conn.py - shared printer connection for TM-T20III probes.
 
 python-escpos Usb() is primary; raw pyusb is the fallback for byte-exact work.
 
-USB IDs: Epson TM printers enumerate under vendor 0x04b8. The TM-T20III USB
-product ID is commonly 0x0e03, but confirm with `python 00_list_usb.py` and
-edit below if your unit differs (interface/Ethernet variants can differ).
+USB IDs: Epson TM printers enumerate under vendor 0x04b8. This unit's TM-T20III
+USB product ID is 0x0e28 (confirmed via Zadig and 00_list_usb.py). If you swap
+to a different unit, re-confirm with `python 00_list_usb.py` and edit below
+(interface/Ethernet variants can differ).
 
 Windows + Zadig: the printer must be bound to WinUSB / libusb-win32 so pyusb
 can claim it. Only one driver can own the device; if Usb() raises a backend
@@ -15,7 +16,7 @@ error, check Zadig is bound to WinUSB, not the Epson APD printer driver.
 import sys
 
 VENDOR_ID = 0x04B8          # Seiko Epson
-PRODUCT_ID = 0x0E03         # TM-T20III (CONFIRM with 00_list_usb.py)
+PRODUCT_ID = 0x0E28         # TM-T20III (confirmed via Zadig: 04B8 0E28)
 OUT_EP = 0x01
 IN_EP = 0x82
 PROFILE = "TM-T20III"
