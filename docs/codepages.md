@@ -13,15 +13,17 @@ The TM-T20III **is** in Epson's *Character Code Tables* support matrix
 Default **PC437 (page 0)**, default international set **USA**. (South Asia
 models drop page 255; this profile targets "Other models.")
 
-**The shipped profile lists 37 of the 43 pages.** Every codec name is
-validated against escpos-printer-db's authoritative `data/encoding.yml`
-(the DB build rejects unknown names -- its assertion caught our original
-`ISO8859_2` spelling; canonical is `ISO_8859-2`). Six pages are deliberately
-omitted:
+**The shipped profile lists 38 of the 43 pages** — the codePages map is
+identical to the merged **TM-T20II sibling profile** (same family/firmware
+lineage), which makes review-by-diff trivial. Every codec name is validated
+against escpos-printer-db's authoritative `data/encoding.yml` (the DB build
+rejects unknown names -- its assertion caught our original `ISO8859_2`
+spelling; canonical is `ISO_8859-2`). Page 11 (`CP851`) is listed per the
+sibling precedent even though encoding.yml defines no encoder for it (the
+entry is informational, like `Unknown`). Five pages are omitted:
 
 | Omitted | Epson name | Why |
 |--------:|------------|-----|
-| 11 | PC851 Greek | exists in encoding.yml but marked *"Not used, due to inconsistencies between implementations"* |
 | 20/21/26 | Thai Character Code 42/11/18 | Epson-custom layouts; no encoding.yml mapping (would need custom `data:` char-map blocks) |
 | 42/43 | PC1118/PC1119 Lithuanian | no encoding.yml mapping; related Baltic pages exist but equivalence unverified |
 

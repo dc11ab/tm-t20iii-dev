@@ -4,9 +4,9 @@
 # Code page set per the "Epson ESC/POS Character Code Tables" support matrix
 # (TM-T20III, "Other models" group): pages 0-5, 11-21, 26, 30-53, 255.
 # Pages 0, 2, 5, 16 and 19 are hardware-confirmed on a real unit (åäö + € via
-# CP858). Codec names validated against data/encoding.yml. Omitted: page 11
-# (PC851, marked unused in encoding.yml), 20/21/26 (Epson's Thai layouts have
-# no encoding.yml mapping) and 42/43 (PC1118/PC1119, no mapping).
+# CP858). Codec names validated against data/encoding.yml and consistent with
+# the merged TM-T20II sibling profile. Omitted: pages 20/21/26 (Epson's Thai
+# layouts have no encoding.yml mapping) and 42/43 (PC1118/PC1119, no mapping).
 TM-T20III:
   name: TM-T20III
   vendor: "Epson"
@@ -14,8 +14,8 @@ TM-T20III:
   notes: >
     Epson TM-T20III, 80mm thermal receipt printer. Feature support is close to
     the TM-T20II/T88 generation. Default code page PC437, default international
-    character set USA. Epson pages 11 (PC851), 20/21/26 (Thai) and 42/43
-    (PC1118/PC1119) are omitted for lack of an unambiguous codec mapping.
+    character set USA. Epson pages 20/21/26 (Thai) and 42/43 (PC1118/PC1119)
+    are omitted for lack of an unambiguous codec mapping.
   media:
     width:
       mm: 80
@@ -35,6 +35,7 @@ TM-T20III:
     3: CP860
     4: CP863
     5: CP865
+    11: CP851
     12: CP853
     13: CP857
     14: CP737

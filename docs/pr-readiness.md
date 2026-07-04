@@ -128,20 +128,32 @@ unset ESCPOS_CAPABILITIES_FILE
 
 ## How to submit (when ready — not done here)
 
+0. **Separate fix PR first (decided 2026-07-04):** `scripts/collate.py` cannot
+   run on stock Windows (opens YAML without `encoding=`; dies on encoding.yml's
+   UTF-8 char-map data). Two-line fix: add `encoding="utf-8"` to the two input
+   `open()` calls in `load_encodings()` and `load_profiles()`. Submit as its
+   own tiny PR from the same fork — do NOT bundle with the profile PR (one PR,
+   one concern). Verify locally by running collate WITHOUT `-X utf8` first.
+
 1. Per `doc/add-your-printer.md`, the maintainers prefer you **open an issue
    first** with the printer info + test-page evidence, then PR the profile.
-2. Fork escpos-printer-db, add `data/profile/TM-T20III.yml`, open the PR.
+2. Fork escpos-printer-db, add `data/profile/TM-T20III.yml`, **and include the
+   regenerated `dist/capabilities.json` + `dist/capabilities.yml`** — confirmed
+   convention from merged profile PRs #92 (Bixolon, 2024) and #62 (TM-T20II):
+   both committed profile + both dist files. Open the PR.
 3. The PR must pass yamllint + the automated build and a contributor review.
 4. Attach/link the hardware evidence (the `artifacts/` photos, this repo).
 
 ## Suggested PR description (copy/adapt)
 
-> Adds a profile for the Epson TM-T20III (80mm thermal). Code-page set per the
-> Epson ESC/POS Character Code Tables matrix ("Other models" group); pages 0,
-> 2, 5, 16 and 19 verified on hardware (Swedish åäö correct, CP858 prints €).
-> Feature support inherits `default`, consistent with sibling TM-T88III. Only
-> code pages with an unambiguous codec mapping are listed; the printer supports
-> additional pages (Thai/Vietnamese/etc.) not included here.
+> Adds a profile for the Epson TM-T20III (80mm thermal), the successor to the
+> TM-T20II already in the database — the codePages map (38 pages) is identical
+> to that sibling's, per the same Epson Character Code Tables matrix. Verified
+> on real hardware: pages 0/2/5/16/19 print-confirmed (Swedish åäö correct,
+> CP858 prints €), 203 dpi / 576-dot printable width confirmed by ruler
+> prints, all nine GS k symbologies + QR verified, and the escpos-php
+> integration file set prints 12 of 12. Evidence, probes and printout photos:
+> https://github.com/dc11ab/tm-t20iii-dev
 
 ## What intentionally stays OUT of the profile
 
