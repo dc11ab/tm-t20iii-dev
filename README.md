@@ -149,9 +149,8 @@ via `ESCPOS_CAPABILITIES_FILE`. See `scripts/build_capabilities.py`. (Until then
 
 The profile is written to match merged-profile conventions and carries no
 unverified codec names. The full readiness checklist, evidence table, and a
-ready-to-adapt PR description live in **`docs/pr-readiness.md`**. Remaining
-gates: `yamllint`, a real escpos-printer-db build, and the two evidence prints
-(tests/07 + tests/08). **The PR itself is intentionally left to do manually.**
+ready-to-adapt PR description live in **`docs/pr-readiness.md`**. 
+`yamllint -d default profile\TM-T20III.yml` returns clean.
 
 ## License
 
