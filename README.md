@@ -116,8 +116,8 @@ python tests\07_capabilities_print.py   # one-page capabilities evidence sheet
 python tests\08_escpos_php_binfiles.py  # escpos-php feature files (upstream ask)
 ```
 
-Printer must be bound to **WinUSB / libusb-win32 via Zadig** (not Epson APD) so
-pyusb can claim it — only one driver can own the device at a time.
+Printer must be bound to **WinUSB / libusb-win32 via [Zadig](https://github.com/pbatard/libwdi/releases/)** (not Epson APD) so
+pyusb can claim it — only one driver can own the device at a time on Windows 11.
 
 ## The @/| fix in one line
 
