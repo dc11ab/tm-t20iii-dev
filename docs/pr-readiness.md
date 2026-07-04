@@ -41,7 +41,7 @@ table to fill in. Photograph each file's output into `artifacts/`.
 
 ## Do-before-PR checklist
 
-- [ ] Run **yamllint** — see "Gate 1" below.
+- [x] OK - Run **yamllint** — see "Gate 1" below.
 - [ ] Run the **real escpos-printer-db build** — see "Gate 2" below.
 - [ ] Smoke-test via python-escpos (`tests/06_profile_smoke.py`, or set
       `ESCPOS_CAPABILITIES_FILE`): confirm `get_profile("TM-T20III")` resolves
@@ -64,8 +64,8 @@ This is the linter the upstream CI runs on every PR. It checks formatting
 pip install yamllint
 cd tm-t20iii-dev
 yamllint profile/TM-T20III.yml
+yamllint -d default profile/TM-T20III.yml
 ```
-
 No output = pass. If it complains, the message names the rule and line — fix and
 re-run. (The repo's own `.yamllint` config is already tuned to match; upstream
 applies its own, so a clean run under the stock `default` config is safest.)
