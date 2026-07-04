@@ -133,25 +133,25 @@ files to your printer and note the output for each file." Run
 upstream set grows; the probe lists the current set via the GitHub API).
 
 ```
-File                          Result                Notes
-----------------------------  --------------------  -----------------------
+File                          Result         Notes
+----------------------------  -------------  -----------------------
 barcode.bin                   [x] OK
 bit-image.bin                 [x] OK
 character-encodings.bin       [x] OK
 character-tables.bin          [x] OK
-demo.bin                      [x] OK                run-1 truncated by the
-                                                    timeout bug; full re-run
-                                                    under the 15 s fix printed
-                                                    everything: all sections,
-                                                    8 logos (4 fn112 +
-                                                    4 GS v 0), 3 QR models
-graphics.bin                  [x] OK                Not reached, but worked on retest
+demo.bin                      [x] OK         run-1 truncated by the timeout
+                                             bug; full re-run under the 15 s
+                                             fix printed everything: all
+                                             sections, 8 logos (4 fn112 +
+                                             4 GS v 0), 3 QR models
+graphics.bin                  [x] OK         not reached in run 1; clean on
+                                             retest
 margins-and-spacing.bin       [x] OK
 pdf417-code.bin               [x] OK
 qr-code.bin                   [x] OK
-receipt-with-logo.bin         [x] OK        Garbled in the pre-fix era only;
-                                                    prints perfectly under the
-                                                    15 s fix (verdict below)
+receipt-with-logo.bin         [x] OK         garbled in the pre-fix era only;
+                                             prints perfectly under the 15 s
+                                             fix (verdict below)
 text-size.bin                 [x] OK
 unifont-print-buffer.bin      [x] OK
 TM-T20III self-test           [x] OK
