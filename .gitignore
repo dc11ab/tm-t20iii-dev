@@ -16,3 +16,4 @@ assets/escpos-php-bin/
 
 # Local drafts (e.g. issue bodies prepared for gh CLI / copy-paste)
 _issue_*.md
+venv/
