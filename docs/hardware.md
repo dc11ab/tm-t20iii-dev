@@ -5,8 +5,8 @@ Fill in from the probes and the printer self-test.
 ## USB identity (tests/00_list_usb.py)
 
 ```
-idVendor:    0x04b8 (Seiko Epson)
-idProduct:   0x0e28   (confirmed via Zadig + 00_list_usb.py)
+idVendor:     0x04b8   (Seiko Epson)
+idProduct:    0x0e28   (confirmed via Zadig + 00_list_usb.py)
 OUT endpoint: 0x01
 IN endpoint:  0x82
 Zadig driver: [x] WinUSB  [ ] libusb-win32  [ ] other
@@ -15,10 +15,10 @@ Zadig driver: [x] WinUSB  [ ] libusb-win32  [ ] other
 ## Self-test (power on holding Feed)
 
 ```
-Product name:
-Firmware version:
-Resident fonts:
-Default code table:
+Product name: TM-T20III
+Firmware version: 15.05 ESC/POS, Main 15.05
+Buffer capacity: 4K bytes
+Resident character: Alphanumeric
 Default international set:   <-- TODO: run self-test. If this is NOT USA, it
                                 explains why rr-receipt saw broken @/|.
 ```
@@ -94,9 +94,9 @@ path rr-receipt already uses produces a good result.
 ## Media width
 
 ```
-Paper width: [x] 80mm  [ ] 58mm
+Paper width: [x] 80mm  [ ] 58mm (58mm supported but not tested)
 Columns (Font A): 48
-media.width.pixels: [ ] 512  [ ] 576   <-- settle with the tests/07 rulers
+media.width.pixels: [ ] 512  [x] 576   <-- settle with the tests/07 rulers
 
 Spec arithmetic says 576: Font A 48 cols x 12 dots = 576; Font B 64 x 9 = 576;
 576 / 203 dpi = 72.06 mm = the documented 72 mm printable width. Profile
@@ -107,16 +107,16 @@ corrected to pixels: 576 + dpi: 203 on this basis; the tests/07 ruler pair
 ## Capabilities print (tests/07) -- one-page evidence sheet
 
 ```
-Printed OK end-to-end?    [ ] yes  [ ] no
+Printed OK end-to-end?    [x] yes  [ ] no
 GS I identity readable?   [ ] yes (firmware: ______, model: ______)  [ ] no
-1D symbologies printed:   [ ] UPC-A  [ ] UPC-E  [ ] EAN13  [ ] EAN8
-                          [ ] CODE39 [ ] ITF    [ ] CODABAR
-                          [ ] CODE93 [ ] CODE128
-QR printed?               [ ] yes  [ ] no
-512-dot ruler:            [ ] clean
-576-dot ruler:            [ ] clean & wider than 512 (=> 576 confirmed)
+1D symbologies printed:   [x] UPC-A  [x] UPC-E  [x] EAN13  [x] EAN8
+                          [x] CODE39 [x] ITF    [x] CODABAR
+                          [x] CODE93 [x] CODE128
+QR printed?               [x] yes  [ ] no
+512-dot ruler:            [x] clean
+576-dot ruler:            [x] clean & wider than 512 (=> 576 confirmed)
                           [ ] wrapped/garbled (=> width is 512; revert profile)
-Photo in artifacts/?      [ ] yes
+Photo in artifacts/?      [x] yes
 ```
 
 ## escpos-php test files (tests/08) -- upstream evidence requirement
@@ -129,16 +129,17 @@ upstream set grows; the probe lists the current set via the GitHub API).
 ```
 File                          Result (OK / partial / fail)   Notes
 ----------------------------  -----------------------------  ---------------
-barcode.bin                   [ ]
-bit-image.bin                 [ ]
-character-encodings.bin       [ ]
-character-tables.bin          [ ]
-demo.bin                      [ ]
-graphics.bin                  [ ]
-qr-code.bin                   [ ]
-receipt-with-logo.bin         [ ]
-text-size.bin                 [ ]
-(other files found by probe)  [ ]
+barcode.bin                   [x] OK
+bit-image.bin                 [x] OK
+character-encodings.bin       [x] OK
+character-tables.bin          [x] OK
+demo.bin                      [x] OK
+graphics.bin                  [ ] FAIL - No printout
+qr-code.bin                   [ ] FAIL - No printout
+receipt-with-logo.bin         [ ] FAIL - No printout
+text-size.bin                 [ ] FAIL - No printout
+(other files found by probe)  [ ] No other files printed
+TM-T20II Self-test            [x] OK
 ```
 
 Photos of each file's output go in `artifacts/`.
