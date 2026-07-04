@@ -85,10 +85,14 @@ pip install -r requirements.txt        # if present; else: pip install pyyaml js
 # 2. drop our profile in alongside the others
 cp ../tm-t20iii-dev/profile/TM-T20III.yml data/profile/
 
-# 3. run the build. There is NO Makefile — it's a Python script under scripts/.
-#    List the dir and run the generator (name may be e.g. generate.py / build.py):
-ls scripts/
-python scripts/<the-build-script>.py
+# 3. run the build. There is NO Makefile -- the build script is
+#    scripts/collate.py (confirmed 2026-07-04; needs `pip install pyaml`,
+#    which is a DIFFERENT package from pyyaml):
+python -m pip install pyaml
+python -X utf8 scripts/collate.py
+#    (-X utf8 is REQUIRED on Windows: collate.py opens its UTF-8 data files
+#    without encoding=, which defaults to cp1252 on Windows and dies with
+#    UnicodeDecodeError otherwise)
 
 # 4. confirm our profile made it into the generated output (written to dist/)
 grep -c "TM-T20III" dist/capabilities.json
