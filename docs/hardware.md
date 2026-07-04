@@ -133,14 +133,14 @@ files to your printer and note the output for each file." Run
 upstream set grows; the probe lists the current set via the GitHub API).
 
 ```
-File                          Result                Notes
-----------------------------  --------------------  -----------------------
+File                          Result         Notes
+----------------------------  -------------  -----------------------
 barcode.bin                   [x] OK
 bit-image.bin                 [x] OK
 character-encodings.bin       [x] OK
 character-tables.bin          [x] OK
 demo.bin                      [x] OK
-graphics.bin                  [x] OK                Not reached, but worked on retest
+graphics.bin                  [x] OK
 margins-and-spacing.bin       [x] OK
 pdf417-code.bin               [x] OK
 qr-code.bin                   [x] OK
