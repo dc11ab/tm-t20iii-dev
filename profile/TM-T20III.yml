@@ -19,8 +19,8 @@ TM-T20III:
   media:
     width:
       mm: 80
-      pixels: 512
-    dpi: 180
+      pixels: 576
+    dpi: 203
   fonts:
     0:
       name: Font A

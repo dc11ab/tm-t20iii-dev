@@ -10,3 +10,9 @@ artifacts/scans/
 # Latest revision A, found on 2026-06-29
 # Stored on Github as a backup only.
 /docs/tm-t20iii_trg_en_reva.pdf
+
+# Cached escpos-php integration .bin files downloaded by tests/08 (upstream-owned)
+assets/escpos-php-bin/
+
+# Local drafts (e.g. issue bodies prepared for gh CLI / copy-paste)
+_issue_*.md

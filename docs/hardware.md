@@ -94,10 +94,54 @@ path rr-receipt already uses produces a good result.
 ## Media width
 
 ```
-Paper width: [ ] 80mm  [ ] 58mm
-Columns (Font A): __
-media.width.pixels: [ ] 512  [ ] 576
+Paper width: [x] 80mm  [ ] 58mm
+Columns (Font A): 48
+media.width.pixels: [ ] 512  [ ] 576   <-- settle with the tests/07 rulers
+
+Spec arithmetic says 576: Font A 48 cols x 12 dots = 576; Font B 64 x 9 = 576;
+576 / 203 dpi = 72.06 mm = the documented 72 mm printable width. Profile
+corrected to pixels: 576 + dpi: 203 on this basis; the tests/07 ruler pair
+(512 and 576) verifies it on paper -- tick the box above when printed.
 ```
+
+## Capabilities print (tests/07) -- one-page evidence sheet
+
+```
+Printed OK end-to-end?    [ ] yes  [ ] no
+GS I identity readable?   [ ] yes (firmware: ______, model: ______)  [ ] no
+1D symbologies printed:   [ ] UPC-A  [ ] UPC-E  [ ] EAN13  [ ] EAN8
+                          [ ] CODE39 [ ] ITF    [ ] CODABAR
+                          [ ] CODE93 [ ] CODE128
+QR printed?               [ ] yes  [ ] no
+512-dot ruler:            [ ] clean
+576-dot ruler:            [ ] clean & wider than 512 (=> 576 confirmed)
+                          [ ] wrapped/garbled (=> width is 512; revert profile)
+Photo in artifacts/?      [ ] yes
+```
+
+## escpos-php test files (tests/08) -- upstream evidence requirement
+
+add-your-printer.md: "For testing out features, you can send escpos-php test
+files to your printer and note the output for each file." Run
+`tests/08_escpos_php_binfiles.py` and note each file below (add rows as the
+upstream set grows; the probe lists the current set via the GitHub API).
+
+```
+File                          Result (OK / partial / fail)   Notes
+----------------------------  -----------------------------  ---------------
+barcode.bin                   [ ]
+bit-image.bin                 [ ]
+character-encodings.bin       [ ]
+character-tables.bin          [ ]
+demo.bin                      [ ]
+graphics.bin                  [ ]
+qr-code.bin                   [ ]
+receipt-with-logo.bin         [ ]
+text-size.bin                 [ ]
+(other files found by probe)  [ ]
+```
+
+Photos of each file's output go in `artifacts/`.
 
 ## NV logo (tests/05, docs/logo.md)  ** NOT PURSUED — see issue #7 (wontfix) **
 
@@ -112,5 +156,9 @@ swap off WinUSB. Probe tests/05_nv_logo.py + how-to retained for future use.
 
 ```
 [ ] Profile matches hardware as written
-[ ] Profile edited — changes:
+[x] Profile edited — changes:
+    - media.dpi 180 -> 203 (Epson datasheet + TRG; 180 was a TM-T88III
+      convention artifact)
+    - media.width.pixels 512 -> 576 (Font A 48x12 = Font B 64x9 = 576 dots
+      = 72 mm @ 203 dpi; verify on paper via the tests/07 ruler pair)
 ```

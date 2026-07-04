@@ -4,13 +4,17 @@ Everything needed to submit `profile/TM-T20III.yml` to
 [receipt-print-hq/escpos-printer-db](https://github.com/receipt-print-hq/escpos-printer-db).
 **This repo stops here — the PR itself is done manually, later.**
 
-## Status: READY (pending two local checks)
+## Status: READY (pending local checks + two evidence prints)
 
 The profile is written to match the conventions of merged Epson profiles
 (compared against `data/profile/TM-T88III.yml`): vendor-doc link comment,
 quoted vendor, folded `notes`, `media` with `dpi`, a `fonts` section, and a
 trimmed `codePages` map with only unambiguous codec names. No `[VERIFY]`
 placeholders remain.
+
+**Media specs corrected 2026-07:** `dpi` 180→203 (Epson datasheet + TRG) and
+`width.pixels` 512→576 (Font A 48×12 = Font B 64×9 = 576 dots = 72 mm @ 203
+dpi). The `tests/07` ruler pair verifies 576 on paper — run it before the PR.
 
 ## Evidence backing the profile (all on hardware)
 
@@ -20,9 +24,20 @@ placeholders remain.
 | @ / \| need ESC R 0 (USA) | `01_at_and_pipe.py` | R0 USA correct; mechanism confirmed |
 | Code pages 0/2/5/16/19 render åäö | `02_codepage_matrix.py` | confirmed; CP858 also prints € |
 | Raster image() (logo/bitmap) | `03_bitmap_emoji.py` | confirmed (Viadal logo + test bitmap) |
-| Media width 512 px @ 80mm | `03` (logo fit) | adequate; not edge-measured |
+| Media width 576 px @ 80mm | `07_capabilities_print.py` rulers | spec arithmetic done; **pending print** |
+| Self-test-style capabilities page | `07_capabilities_print.py` | **pending print** (one-page evidence sheet) |
+| escpos-php feature files (upstream ask) | `08_escpos_php_binfiles.py` | **pending run** — record per-file in `docs/hardware.md` |
 
 See `docs/hardware.md` for the detail and `artifacts/` for the printout photos.
+
+### The escpos-php evidence requirement, specifically
+
+`doc/add-your-printer.md` says: *"For testing out features, you can send
+[escpos-php test files] to your printer and note the output for each file."*
+`tests/08_escpos_php_binfiles.py` automates this: it pulls the current `.bin`
+set from mike42/escpos-php via the GitHub API, streams each file with a
+printed banner + cut + pause, and `docs/hardware.md` has the per-file results
+table to fill in. Photograph each file's output into `artifacts/`.
 
 ## Do-before-PR checklist
 
@@ -31,9 +46,14 @@ See `docs/hardware.md` for the detail and `artifacts/` for the printout photos.
 - [ ] Smoke-test via python-escpos (`tests/06_profile_smoke.py`, or set
       `ESCPOS_CAPABILITIES_FILE`): confirm `get_profile("TM-T20III")` resolves
       and Swedish + barcode/QR print.
+- [ ] Run `tests/07_capabilities_print.py` — the one-page evidence sheet; also
+      settles 512-vs-576 via the ruler pair. Photograph into `artifacts/`.
+- [ ] Run `tests/08_escpos_php_binfiles.py` and fill the per-file results
+      table in `docs/hardware.md` (explicit ask in add-your-printer.md).
+- [ ] Run the built-in self-test (power on holding FEED) — records firmware +
+      default international set in `docs/hardware.md`.
 - [ ] Confirm the vendor-doc link in the profile header still resolves (Epson
       reshuffles URLs; update if it 404s).
-- [ ] *(optional)* Edge-measure printable width to confirm 512 vs 576 px.
 
 ## Gate 1 — yamllint (quick)
 
