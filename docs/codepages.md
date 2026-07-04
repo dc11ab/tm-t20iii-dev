@@ -13,14 +13,21 @@ The TM-T20III **is** in Epson's *Character Code Tables* support matrix
 Default **PC437 (page 0)**, default international set **USA**. (South Asia
 models drop page 255; this profile targets "Other models.")
 
-**The shipped profile deliberately lists fewer than 43 pages (27).** Matching
-the convention of merged Epson profiles (e.g. TM-T88III, which lists ~12), it
-includes only pages whose escpos-printer-db **codec name is unambiguous**. The
-exotic pages — Thai (20/21/26), Vietnamese (30/31), Farsi (41), Lithuanian
-(42/43), Kazakh (53) — were dropped rather than shipped with guessed codec
-names, because the DB's build validation rejects unknown codecs and a clean PR
-shouldn't carry unverified mappings. The profile `notes` records that the
-printer supports more pages than are listed.
+**The shipped profile lists 37 of the 43 pages.** Every codec name is
+validated against escpos-printer-db's authoritative `data/encoding.yml`
+(the DB build rejects unknown names -- its assertion caught our original
+`ISO8859_2` spelling; canonical is `ISO_8859-2`). Six pages are deliberately
+omitted:
+
+| Omitted | Epson name | Why |
+|--------:|------------|-----|
+| 11 | PC851 Greek | exists in encoding.yml but marked *"Not used, due to inconsistencies between implementations"* |
+| 20/21/26 | Thai Character Code 42/11/18 | Epson-custom layouts; no encoding.yml mapping (would need custom `data:` char-map blocks) |
+| 42/43 | PC1118/PC1119 Lithuanian | no encoding.yml mapping; related Baltic pages exist but equivalence unverified |
+
+Notable canonical names (differ from obvious guesses): Vietnamese 30/31 =
+`TCVN-3-1`/`TCVN-3-2`, Kazakh 53 = `RK1048` (Epson calls it KZ-1048; same
+ST RK 1048 standard), Farsi 41 = `CP1098`. Full resolution history: issue #11.
 
 ## Integer → encoding map (the Swedish-relevant pages)
 
@@ -48,7 +55,9 @@ default CP858).
 Those are low-ASCII and governed by `ESC R` (international set), not `ESC t`.
 See `docs/at-and-pipe.md`. Don't chase the @/| bug through code pages.
 
-## Width: 512 vs 576
+## Width: 576 dots
 
-T20-class 80mm is 512 dots — confirmed adequate for the Viadal logo raster
-(`tests/03`). Affects `media.width.pixels` and full-width raster images.
+The TM-T20III's printable width is **576 dots / 72 mm** at 203 dpi (Font A
+48 cols x 12 dots = Font B 64 x 9 = 576; ruler-confirmed on paper by
+`tests/07`). An early profile draft said 512 -- corrected. Affects
+`media.width.pixels` and full-width raster images.
