@@ -144,29 +144,33 @@ graphics.bin                  [x] OK                Not reached,
 margins-and-spacing.bin       [x] OK
 pdf417-code.bin               [x] OK
 qr-code.bin                   [x] OK
-receipt-with-logo.bin         [x] FAIL        Garbled logo, text-string at end visible
+receipt-with-logo.bin         [ ] FAIL        Garbled logo, text-string at end visible
 text-size.bin                 [x] OK
 unifont-print-buffer.bin      [x] OK
 TM-T20III self-test           [x] OK
 
-Upstream ships 12 .bin files (verified via the GitHub API, 2026-07-04). The
-first run printed exactly the first five in sort order, then nothing --
-including files whose features tests/07 already proved on this unit (QR,
-text sizes). Hypothesis: a graphics block with a declared byte-length
-swallowed all subsequent bytes (banners included) as raster payload, so the
-later silences are artifacts of ONE bad stream, not per-file failures.
+Result: 11 of 12 upstream files print correctly (upstream ships exactly
+these 12 .bin files, verified via the GitHub API, 2026-07-04).
 
-Retest: power-cycle the printer, then run each remaining file in its own
-session (files are already cached in assets/escpos-php-bin/):
-    python 08_escpos_php_binfiles.py --only text-size
-    python 08_escpos_php_binfiles.py --only qr-code
-    python 08_escpos_php_binfiles.py --only pdf417
-    python 08_escpos_php_binfiles.py --only margins
-    python 08_escpos_php_binfiles.py --only unifont
-    python 08_escpos_php_binfiles.py --only receipt-with-logo
-    python 08_escpos_php_binfiles.py --only graphics    <- LAST; power-cycle after
-Mark results above; only a file that stays silent when run ALONE after a
-fresh power-cycle is a genuine FAIL.
+Root cause of the run-1 silence (supersedes the earlier stream-poisoning
+hypothesis): a USB WRITE TIMEOUT, not the printer. pyusb's default 1 s
+bulk-write timeout is too short right after large jobs -- the printer's 4K
+buffer stays full for seconds while it physically prints -- so the run-1
+script crashed mid-sequence and later files were never SENT. Per-file
+retests after a power-cycle printed everything (pdf417 and
+receipt-with-logo threw the same benign timeout on the trailing feed cut,
+after their content was already sent). Fixes applied: conn.RawUsb.write now
+uses a 15 s timeout; tests/08 survives trailing feed/cut timeouts with a
+warning instead of crashing.
+
+receipt-with-logo.bin: the one genuine anomaly. Only the logo block
+garbles; the stream re-syncs and the trailing text prints correctly. Cannot
+be a graphics-capability problem: graphics.bin exercises the same images
+and prints fine, as do tests/03/07 rasters. Hypothesis: the embedded logo
+raster assumes a different printable width or an image-mode variant this
+model dislikes, so its rows wrap into noise until the block ends. Optional
+follow-up: scan the file's GS v 0 / GS ( L / ESC * headers for declared
+widths and compare against 576. Not a profile blocker.
 ```
 
 Photos of each file's output go in `artifacts/`.

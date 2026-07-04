@@ -135,8 +135,11 @@ def main():
         banner(p, name)
         sent = send_file(p, path)
         print(f"  sent {sent} bytes")
-        p.write(b"\n\n\n\n")
-        p.write(bytes([GS, ord("V"), 66, 0]))      # cut between files
+        try:
+            p.write(b"\n\n\n\n")
+            p.write(bytes([GS, ord("V"), 66, 0]))  # cut between files
+        except Exception as exc:  # noqa: BLE001  (printer busy: warn, go on)
+            print(f"  trailing feed/cut failed ({exc}); continuing")
         if not args.no_pause and i < len(paths):
             ans = input("  Enter=next file, s=stop: ").strip().lower()
             if ans == "s":

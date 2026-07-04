@@ -67,8 +67,12 @@ class RawUsb:
         self.dev = dev
         self.out_ep = out_ep
 
-    def write(self, data: bytes):
-        self.dev.write(self.out_ep, data)
+    def write(self, data: bytes, timeout=15000):
+        """Bulk write with a generous timeout. Right after large jobs the
+        printer's 4K buffer stays full for seconds while it prints; pyusb's
+        1 s default then raises USBTimeoutError mid-sequence (seen on the
+        escpos-php runs, tests/08)."""
+        self.dev.write(self.out_ep, data, timeout)
 
     def read(self, in_ep=IN_EP, length=64, timeout=1000):
         return bytes(self.dev.read(in_ep, length, timeout))
