@@ -19,8 +19,12 @@ Product name: TM-T20III
 Firmware version: 15.05 ESC/POS, Main 15.05
 Buffer capacity: 4K bytes
 Resident character: Alphanumeric
-Default international set:   <-- TODO: run self-test. If this is NOT USA, it
-                                explains why rr-receipt saw broken @/|.
+Default international set: not reported on the TM-T20III self-test printout.
+  Moot for rr-receipt: every job pins ESC R 0 right after ESC @, so the
+  power-on default never matters. To determine it empirically anyway:
+  power-cycle, temporarily comment the ESC R line in tests/07 init(), run 07
+  and read the ASCII rows -- whatever glyphs appear at 0x40/0x7C reveal the
+  default set.
 ```
 
 ## @ and | (tests/01_at_and_pipe.py)  ** primary issue — RESOLVED **
@@ -37,7 +41,9 @@ Mechanism confirmed: code page was held fixed during the test; @ and |
 changed purely with ESC R. So ESC R (international set), not ESC t
 (code page), governs these characters. See docs/at-and-pipe.md.
 
-Was the printer's default set already USA?   [ ] yes  [ ] no  (TODO: self-test)
+Was the printer's default set already USA?   [ ] yes  [ ] no
+  (the self-test doesn't report it -- see Self-test section for the optional
+  empirical check; moot since ESC R 0 is pinned per job)
 Fix applied: [x] send ESC R 0 (1B 52 00) per job after ESC @
              [ ] changed memory-switch default to USA (optional, via Utility)
 ```
@@ -127,19 +133,40 @@ files to your printer and note the output for each file." Run
 upstream set grows; the probe lists the current set via the GitHub API).
 
 ```
-File                          Result (OK / partial / fail)   Notes
-----------------------------  -----------------------------  ---------------
+File                          Result                Notes
+----------------------------  --------------------  -----------------------
 barcode.bin                   [x] OK
 bit-image.bin                 [x] OK
 character-encodings.bin       [x] OK
 character-tables.bin          [x] OK
 demo.bin                      [x] OK
-graphics.bin                  [ ] FAIL - No printout
-qr-code.bin                   [ ] FAIL - No printout
-receipt-with-logo.bin         [ ] FAIL - No printout
-text-size.bin                 [ ] FAIL - No printout
-(other files found by probe)  [ ] No other files printed
-TM-T20II Self-test            [x] OK
+graphics.bin                  [x] OK                Not reached, but worked on retest
+margins-and-spacing.bin       [x] OK
+pdf417-code.bin               [x] OK
+qr-code.bin                   [x] OK
+receipt-with-logo.bin         [x] FAIL        Garbled logo, text-string at end visible
+text-size.bin                 [x] OK
+unifont-print-buffer.bin      [x] OK
+TM-T20III self-test           [x] OK
+
+Upstream ships 12 .bin files (verified via the GitHub API, 2026-07-04). The
+first run printed exactly the first five in sort order, then nothing --
+including files whose features tests/07 already proved on this unit (QR,
+text sizes). Hypothesis: a graphics block with a declared byte-length
+swallowed all subsequent bytes (banners included) as raster payload, so the
+later silences are artifacts of ONE bad stream, not per-file failures.
+
+Retest: power-cycle the printer, then run each remaining file in its own
+session (files are already cached in assets/escpos-php-bin/):
+    python 08_escpos_php_binfiles.py --only text-size
+    python 08_escpos_php_binfiles.py --only qr-code
+    python 08_escpos_php_binfiles.py --only pdf417
+    python 08_escpos_php_binfiles.py --only margins
+    python 08_escpos_php_binfiles.py --only unifont
+    python 08_escpos_php_binfiles.py --only receipt-with-logo
+    python 08_escpos_php_binfiles.py --only graphics    <- LAST; power-cycle after
+Mark results above; only a file that stays silent when run ALONE after a
+fresh power-cycle is a genuine FAIL.
 ```
 
 Photos of each file's output go in `artifacts/`.
