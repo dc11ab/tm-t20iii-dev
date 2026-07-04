@@ -16,14 +16,15 @@ hardware-confirmed on a real unit.
 
 ## Context
 
-The Epson TM-T20III is a compact, monochrome thermal receipt printer. It utilizes direct thermal printing technology, which eliminates the need for ink or toner, producing high-quality text and graphics at speeds up to 200mm per second. The printer is known for its reliability and ease of integration, offering various connectivity options including USB, serial, parallel, and Ethernet interfaces (depending upon model).
+The Epson TM-T20III is a compact, monochrome thermal receipt printer. It utilizes direct thermal printing technology, which eliminates the need for ink or toner, producing high-quality text and graphics at speeds up to 250mm per second. The printer is known for its reliability and ease of integration, offering various connectivity options including USB, serial, parallel, and Ethernet interfaces (depending upon model).
 
 **The TM-T20III supports standard width of 80mm roll paper**. It also features an adjustable paper guide that allows it to accommodate 58mm paper rolls. The printer includes an auto-cutter function to separate receipts and typically supports roll diameters up to 83mm, ensuring extended operation without frequent paper changes.
 
 ## Development status
 
-Core hardware findings are **done**. Two evidence prints remain before the
-upstream PR (see `docs/pr-readiness.md`), which is left to do manually.
+Hardware testing is **complete** and both submission gates (yamllint + the
+real escpos-printer-db build, `scripts/collate.py`) **pass** on the final
+profile. See `docs/pr-readiness.md`; the upstream PR itself is done manually.
 
 | Probe | What | Status |
 |-------|------|--------|
@@ -33,8 +34,10 @@ upstream PR (see `docs/pr-readiness.md`), which is left to do manually.
 | `03_bitmap_emoji.py` | raster image / logo | ✅ Logo png prints clean |
 | `04_user_defined_glyph.py` | `ESC &` custom glyph | not run (not needed) |
 | `05_nv_logo.py` | NV stored logo | ⏭️ skipped (issue #7, wontfix) |
-| `07_capabilities_print.py` | self-test-style evidence page + 512/576 ruler | ⏳ pending run |
-| `08_escpos_php_binfiles.py` | escpos-php `.bin` feature files (upstream ask) | ⏳ pending run |
+| `07_capabilities_print.py` | self-test-style evidence page + 512/576 ruler | ✅ all pass; 576 dots confirmed |
+| `08_escpos_php_binfiles.py` | escpos-php `.bin` feature files (upstream ask) | ✅ 12 of 12 print correctly |
+| `09_analyze_binfile.py` | static ESC/POS stream analyzer | 🔧 diagnostic tool |
+| `10_fn112_matrix.py` | raster isolation matrix | 🔧 diagnostic tool |
 
 ## Printer specification (Epson TM-T20III)
 
@@ -91,6 +94,8 @@ tests/     00_list_usb.py         confirm USB IDs / endpoints (run first)
            06_profile_smoke.py    validate via python-escpos once registered
            07_capabilities_print.py  self-test-style evidence page + rulers
            08_escpos_php_binfiles.py escpos-php .bin files, one per pause
+           09_analyze_binfile.py  static ESC/POS analyzer (widths, DLE scan)
+           10_fn112_matrix.py     raster isolation matrix (diagnostic)
            conn.py                Usb() primary (profile=None fallback), raw pyusb
 scripts/   build_capabilities.py  make TM-T20III resolvable (the "recompile")
 docs/      at-and-pipe.md         root cause + fix for the @/| bug
@@ -147,10 +152,13 @@ via `ESCPOS_CAPABILITIES_FILE`. See `scripts/build_capabilities.py`. (Until then
 
 ## Upstream PR
 
-The profile is written to match merged-profile conventions and carries no
-unverified codec names. The full readiness checklist, evidence table, and a
-ready-to-adapt PR description live in **`docs/pr-readiness.md`**. 
-`yamllint -d default profile\TM-T20III.yml` returns clean.
+The profile ships **38 code pages — identical to the merged TM-T20II sibling
+profile** — with every codec name validated by the DB's own build (Gate 2)
+and `yamllint -d default profile\TM-T20III.yml` returning clean (Gate 1).
+Media specs are hardware-verified: 203 dpi, 576-dot printable width (ruler
+prints, tests/07). The checklist, submission steps (incl. a separate Windows
+build-fix PR) and a ready-to-adapt PR description live in
+**`docs/pr-readiness.md`**.
 
 ## License
 
