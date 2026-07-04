@@ -139,17 +139,24 @@ barcode.bin                   [x] OK
 bit-image.bin                 [x] OK
 character-encodings.bin       [x] OK
 character-tables.bin          [x] OK
-demo.bin                      [x] OK
+demo.bin                      [x] OK                run-1 truncated by the
+                                                    timeout bug; full re-run
+                                                    under the 15 s fix printed
+                                                    everything: all sections,
+                                                    8 logos (4 fn112 +
+                                                    4 GS v 0), 3 QR models
 graphics.bin                  [x] OK                Not reached, but worked on retest
 margins-and-spacing.bin       [x] OK
 pdf417-code.bin               [x] OK
 qr-code.bin                   [x] OK
-receipt-with-logo.bin         [ ] FAIL        Garbled logo, text-string at end visible
+receipt-with-logo.bin         [x] OK        Garbled in the pre-fix era only;
+                                                    prints perfectly under the
+                                                    15 s fix (verdict below)
 text-size.bin                 [x] OK
 unifont-print-buffer.bin      [x] OK
 TM-T20III self-test           [x] OK
 
-Result: 11 of 12 upstream files print correctly (upstream ships exactly
+Result: 12 of 12 upstream files print correctly (upstream ships exactly
 these 12 .bin files, verified via the GitHub API, 2026-07-04).
 
 Root cause of the run-1 silence (supersedes the earlier stream-poisoning
@@ -157,20 +164,40 @@ hypothesis): a USB WRITE TIMEOUT, not the printer. pyusb's default 1 s
 bulk-write timeout is too short right after large jobs -- the printer's 4K
 buffer stays full for seconds while it physically prints -- so the run-1
 script crashed mid-sequence and later files were never SENT. Per-file
-retests after a power-cycle printed everything (pdf417 and
-receipt-with-logo threw the same benign timeout on the trailing feed cut,
-after their content was already sent). Fixes applied: conn.RawUsb.write now
+retests after a power-cycle printed 11 of 12 (pdf417 and receipt-with-logo
+threw the same trailing-feed timeout; receipt-with-logo also garbled --
+resolved below). Fixes applied: conn.RawUsb.write now
 uses a 15 s timeout; tests/08 survives trailing feed/cut timeouts with a
 warning instead of crashing.
 
-receipt-with-logo.bin: the one genuine anomaly. Only the logo block
-garbles; the stream re-syncs and the trailing text prints correctly. Cannot
-be a graphics-capability problem: graphics.bin exercises the same images
-and prints fine, as do tests/03/07 rasters. Hypothesis: the embedded logo
-raster assumes a different printable width or an image-mode variant this
-model dislikes, so its rows wrap into noise until the block ends. Optional
-follow-up: scan the file's GS v 0 / GS ( L / ESC * headers for declared
-widths and compare against 576. Not a profile blocker.
+receipt-with-logo.bin garble -- RESOLVED: a transport artifact of our own
+probe tooling, not a printer or file defect. Investigation record (kept
+because the method generalizes):
+  * tests/09 static analysis: the file is VALID -- GS ( L fn112, W=300 x
+    H=236, payload 8,968 B = ceil(300/8) x 236 exactly; whole file parses
+    cleanly; NO real-time DLE sequences (10 04/05/14) in any payload.
+  * tests/10 hardware matrix: big-payload LEFT, big-payload CENTER (the
+    exact failing combo), small CENTER, and GS v 0 -- all four print clean.
+    Payload size, centering, and the fn112 command all exonerated.
+  * The decisive clue was on the garbled slip itself: its tail shows
+    graphics.bin's closing text ("Large Tux in correct proportion.") --
+    the desync SPANNED TWO SEPARATE RUNS (which is also why graphics.bin
+    was run twice; the first pass was consumed by the desynced stream).
+    A printer that cleanly received a valid file cannot stay desynced into
+    the next process's job, so the bytes did not arrive as sent during the
+    pre-fix runs, despite libusb reporting success. Those runs used
+    pyusb's 1 s default bulk-write timeout and crashed mid-sequence
+    (USBTimeoutError) with pending I/O.
+  * Under the corrected transport (conn.RawUsb.write timeout 15 s,
+    tests/08 surviving trailing-write timeouts): the identical cached file
+    prints PERFECTLY, and demo.bin's four fn112 blocks of the same logo
+    print perfectly too. Reproducibly clean.
+Conclusion: printer and escpos-php file both exonerated; no upstream
+report warranted. Lesson for rr-receipt (#55/#56 context): bulk-write
+timeouts must comfortably exceed worst-case print-drain time, and a
+timed-out or crashed sender can leave a poisoned stream that garbles
+SUBSEQUENT jobs -- treat any USBTimeoutError as a reason to re-init
+(ESC @) and re-verify output before trusting the next job.
 ```
 
 Photos of each file's output go in `artifacts/`.
